@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:js/js.dart';
+import 'package:slp_podcast_ai/colors.dart';
 import 'lnurl_js.dart' as lnurl;
 
 class PodcastCard extends StatefulWidget {
@@ -24,7 +25,7 @@ class _PodcastCardState extends State<PodcastCard> {
     final String lnAddress = widget.podcastData['ln_address'];
 
     return Card(
-      margin: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.all(8),
       elevation: 4.0,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -95,6 +96,7 @@ class _PodcastCardState extends State<PodcastCard> {
     return IconButton(
       icon: const Icon(Icons.bolt_outlined),
       onPressed: () => _showZapDialog(lnAddress),
+      color: lighteningYellow,
     );
   }
 

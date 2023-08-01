@@ -18,6 +18,7 @@ async function isWeblnEnabled(weblnEnabledCallback, weblnDisabledCallback) {
 async function sendPayment(invoice, authCallback) {
     try {
         const payResponse = await webln.sendPayment(invoice);
+        console.log(payResponse);
         authCallback(payResponse.preimage);
     } catch (error) {
         console.error(error);

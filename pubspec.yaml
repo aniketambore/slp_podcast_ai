@@ -12,11 +12,17 @@ dependencies:
     sdk: flutter
   js: ^0.6.5
   nostr_tools: ^1.0.7
+  flex_color_scheme: ^7.2.0
+  envied: ^0.3.0+3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+  build_runner: ^2.4.6
+  envied_generator: ^0.3.0+3
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/

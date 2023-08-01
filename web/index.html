@@ -2,24 +2,12 @@
 <html>
 
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
+  <title>SLP Podcast AI</title>
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Join the Bitcoin Talk Show - Your Personal AI Podcast!">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -30,7 +18,6 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png" />
 
-  <title>slp_podcast_ai</title>
   <link rel="manifest" href="manifest.json">
 
   <script>
@@ -44,18 +31,106 @@
 </head>
 
 <body>
+  <style>
+    body {
+      background-color: #212121;
+    }
+  </style>
+
+  <!-- Loading spinner -->
+  <div id="loading">
+    <style>
+      body {
+        overflow: hidden;
+      }
+
+      #loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.8);
+        /* Changed to dark background */
+        z-index: 9999;
+      }
+
+      /* Added new CSS for the circular image */
+      #loading img.circular-image {
+        width: 250px;
+        /* Adjust the size as per your preference */
+        height: 250px;
+        /* Adjust the size as per your preference */
+        border: 8px solid #ff6563;
+        /* Neon red border */
+        border-radius: 50%;
+        /* Creates a circular image */
+        animation: spin 1s infinite linear;
+      }
+
+      /* Added new CSS for the loading text */
+      #loading p {
+        margin-top: 10px;
+        /* Adjust the spacing as per your preference */
+        font-size: 18px;
+        /* Adjust the font size as per your preference */
+        color: #00dffe;
+        /* Neon red text color */
+        font-weight: bold;
+        text-align: center;
+      }
+
+      /* Added new CSS for the rectangular image */
+      #loading img.rectangular-image {
+        max-width: 100%;
+        /* Ensures the image scales down responsively */
+        height: auto;
+        /* Allows the image to maintain its aspect ratio */
+        margin-top: 20px;
+        /* Adjust the spacing as per your preference */
+        border: 4px solid #0093a7;
+        /* Neon red border */
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+    <img class="circular-image" src="icons/slp_logo.png" alt="Loading..." />
+    <p>Loading SLP Podcast AI...</p>
+    <img class="rectangular-image" src="https://i.ibb.co/cFhTzMV/original.png" alt="Rectangular Image" />
+  </div>
+
+
+
   <script>
     window.addEventListener('load', function (ev) {
+      var loading = document.querySelector('#loading');
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({
         serviceWorker: {
           serviceWorkerVersion: serviceWorkerVersion,
-        },
-        onEntrypointLoaded: function (engineInitializer) {
-          engineInitializer.initializeEngine().then(function (appRunner) {
-            appRunner.runApp();
-          });
         }
+      }).then(function (engineInitializer) {
+        loading.classList.add('main_done');
+        return engineInitializer.initializeEngine();
+      }).then(function (appRunner) {
+        loading.classList.add('init_done');
+        return appRunner.runApp();
+      }).then(function (app) {
+        window.setTimeout(function () {
+          loading.remove();
+        }, 200);
       });
     });
   </script>

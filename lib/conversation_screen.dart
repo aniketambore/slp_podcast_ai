@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:js/js.dart';
 import 'package:nostr_tools/nostr_tools.dart';
+import 'package:slp_podcast_ai/env.dart';
 
 import 'webln_js.dart' as webln;
 
@@ -27,7 +28,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   List<Map<String, String>> conversation = [];
   String _botResponse = 'Loading...';
   String prompt = '''
-You are GPT Livera, the host of the "Stephan Livera Show," a captivating podcast that delves into the world of Bitcoin, economics, and financial sovereignty. Inspired by the legendary Stephan Livera himself, you embody his conversational style and mannerisms, creating a comfortable and engaging atmosphere for thought-provoking discussions with your guests.
+You are GPT Livera, the host of the "Stephan Livera Podcast," a captivating podcast that delves into the world of Bitcoin, economics, and financial sovereignty. Inspired by the legendary Stephan Livera himself, you embody his conversational style and mannerisms, creating a comfortable and engaging atmosphere for thought-provoking discussions with your guests.
 
 As GPT Livera, you adopt the following 15 behaviors that define the essence of Stephan Livera's podcasting prowess:
 
@@ -68,7 +69,9 @@ User: [User's message]
 AI: [AI's response starting with "🎙️ GPT Livera: "]
 ---
 
-Also remember that when the conversation ends give me this hash as GPT Livera response so that I know that the podcast is over now: 32b9e6d5425421c95f7137058bffba76aa217f35224deb9ce51c99abf573b1c2 
+Remember to keep the podcast as small as possible not more than 4 questions to ask.
+
+Also remember that when the conversation ends give me this hash as GPT Livera response so that I know that the podcast is over now: ${Env.endingSecret} 
 
 Now, let's get this captivating podcast started! Please introduce yourself, my esteemed guest, and tell us your name and field of expertise. We're all ears and eager to embark on this enlightening journey together! 🎧😊
 ''';
@@ -83,6 +86,8 @@ Now, let's get this captivating podcast started! Please introduce yourself, my e
 
   final _completePodcast = <String>[];
 
+  bool _isWebln = false;
+
   @override
   void initState() {
     webln.isWeblnEnabled(
@@ -93,6 +98,7 @@ Now, let's get this captivating podcast started! Please introduce yourself, my e
   }
 
   Future<void> welcomeBot() async {
+    setState(() => _isWebln = true);
     await _sendMessageToBot(prompt);
   }
 
@@ -130,16 +136,20 @@ Now, let's get this captivating podcast started! Please introduce yourself, my e
   }
 
   Future<void> _handlePaymentResponse(Response response) async {
-    final lnurl = response.headers['www-authenticate'];
+    final lnurl = response.headers['Www-authenticate'];
 
     if (lnurl != null) {
       for (String item in lnurl) {
         if (item.contains("token=")) {
           token = item.split("token=")[1];
+          token =
+              token.replaceAll('"', ''); // Remove double quotes from the token
         }
 
         if (item.contains("invoice=")) {
           invoice = item.split("invoice=")[1];
+          invoice = invoice.replaceAll(
+              '"', ''); // Remove double quotes from the invoice
         }
       }
 
@@ -166,35 +176,38 @@ Now, let's get this captivating podcast started! Please introduce yourself, my e
     );
 
     if (result.statusCode == 200) {
-      final responseData =
-          jsonDecode(result.data)['choices'][0]['message']['content'];
-      setState(() {
-        _botResponse = responseData;
+      debugPrint('Result data is ${result.data}');
+      try {
+        // Convert the response data to a JSON string
+        final jsonString = jsonEncode(result.data);
 
-        // Check if the responseData contains the hash at the end
-        final hasHash = responseData.endsWith(
-            '32b9e6d5425421c95f7137058bffba76aa217f35224deb9ce51c99abf573b1c2');
+        final responseData =
+            jsonDecode(jsonString)['choices'][0]['message']['content'];
+        setState(() {
+          _botResponse = responseData;
 
-        // Remove the hash if it exists at the end of responseData
-        final responseTextWithoutHash = hasHash
-            ? responseData
-                .replaceFirst(
-                    '32b9e6d5425421c95f7137058bffba76aa217f35224deb9ce51c99abf573b1c2',
-                    '')
-                .trim()
-            : responseData.trim();
+          // Check if the responseData contains the hash at the end
+          final hasHash = responseData.endsWith(Env.endingSecret);
 
-        _completePodcast.add(responseTextWithoutHash);
+          // Remove the hash if it exists at the end of responseData
+          final responseTextWithoutHash = hasHash
+              ? responseData.replaceFirst(Env.endingSecret, '').trim()
+              : responseData.trim();
 
-        // Add AI's response to the conversation context
-        conversation
-            .add({'role': 'assistant', 'content': responseTextWithoutHash});
+          _completePodcast.add(responseTextWithoutHash);
 
-        // Check if the conversation is ending
-        if (hasHash) {
-          _showConversationDialog();
-        }
-      });
+          // Add AI's response to the conversation context
+          conversation
+              .add({'role': 'assistant', 'content': responseTextWithoutHash});
+
+          // Check if the conversation is ending
+          if (hasHash) {
+            _showConversationDialog();
+          }
+        });
+      } catch (e) {
+        debugPrint('[!] Error here is: $e');
+      }
     } else {
       handleError('Failed to retrieve completion: ${result.statusCode}');
     }
@@ -225,17 +238,20 @@ Now, let's get this captivating podcast started! Please introduce yourself, my e
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Conversation Screen'),
+        title: const Text('SLP Podcast AI'),
         centerTitle: true,
+        backgroundColor: _isWebln ? Colors.indigoAccent : Colors.redAccent,
         actions: [
-          IconButton(
-            onPressed: () {
-              _showConversationDialog();
-            },
-            icon: const Icon(
-              Icons.chat_outlined,
-            ),
-          ),
+          _completePodcast.isNotEmpty
+              ? IconButton(
+                  onPressed: () {
+                    _showConversationDialog();
+                  },
+                  icon: const Icon(
+                    Icons.chat_outlined,
+                  ),
+                )
+              : Container(),
         ],
       ),
       body: Column(
@@ -259,8 +275,11 @@ Now, let's get this captivating podcast started! Please introduce yourself, my e
             child: TextField(
               enabled: !_aiTyping,
               controller: _textEditingController,
+              maxLines: 8,
+              minLines: 1,
               decoration: InputDecoration(
                 border: const OutlineInputBorder(),
+                hintText: 'Enter your message...',
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.send),
                   onPressed: _sendMessage,
@@ -282,13 +301,39 @@ Now, let's get this captivating podcast started! Please introduce yourself, my e
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Conversation History'),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: _completePodcast.map((item) {
-                return Text(item);
-              }).toList(),
+          title: Container(
+            padding: const EdgeInsets.symmetric(vertical: 21),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.indigo,
+            ),
+            child: const Center(
+              child: Text(
+                'Conversation History',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          content: Container(
+            constraints: const BoxConstraints(maxWidth: 600),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: _completePodcast.map((item) {
+                  return Card(
+                      child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(item),
+                  ));
+                }).toList(),
+              ),
             ),
           ),
           actions: [
@@ -345,7 +390,6 @@ Now, let's get this captivating podcast started! Please introduce yourself, my e
                 final content = encodeJson(_completePodcast, lnAddress);
                 final eventApi = EventApi();
                 final event = eventApi.finishEvent(
-                  // 4
                   Event(
                     kind: 1,
                     tags: [
@@ -354,7 +398,7 @@ Now, let's get this captivating podcast started! Please introduce yourself, my e
                     content: content,
                     created_at: DateTime.now().millisecondsSinceEpoch ~/ 1000,
                   ),
-                  'c53e55fc69a155fd0a8fb8466a532ba54eafdf4470027478b244264b3d4748ab',
+                  Env.nostrPrivKey,
                 );
 
                 widget.relay.publish(event);
