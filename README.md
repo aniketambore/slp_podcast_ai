@@ -34,13 +34,13 @@ To run the Stephan Livera Podcast AI project locally, follow these steps:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username StephanLiveraPodcastAI.git
+git clone https://github.com/aniketambore/slp_podcast_ai.git
 ```
 
 2. Install dependencies:
 
 ```bash
-cd StephanLiveraPodcastAI
+cd slp_podcast_ai
 
 flutter pub get
 ```
@@ -64,13 +64,13 @@ Then run the project for web.
 > Note: To enable seamless payments and full functionality, users must have a WebLN provider and sufficient funds in their Lightning Network wallet.
 
 ## Future Enhancements
-We have big plans for the future of the Stephan Livera Podcast AI project! Some of the planned enhancements include:
+I've some big plans for the future of the Stephan Livera Podcast AI project! Some of the planned enhancements include:
 
 - **In-App Wallet**: Integrate an in-app wallet for automatic payment of AI conversations using Breez SDK.
 - **Voice Clone**: Create a unique voice clone of Stephan Livera for an immersive experience.
--**Speech-to-Text and Text-to-Speech**: Enable audio interactions between users and the AI.
+- **Speech-to-Text and Text-to-Speech**: Enable audio interactions between users and the AI.
 
-We welcome contributions from the community to help bring these enhancements to life!
+Welcoming contributions from the community to help bring these enhancements to life!
 
 ## Technology Stack
 - **Frontend**: Flutter framework.
@@ -78,10 +78,10 @@ We welcome contributions from the community to help bring these enhancements to 
 - **Lightning Integration**: LNURLPay for generating lightning invoices for podcast tipping.
 - **WebLN**: Facilitating communication with WebLN providers.
 
-## Connect with Us
-We'd love to hear from you! Connect with us on Twitter ([@Anipy1](https://twitter.com/Anipy1)) or find us on Nostr ([@Anipy](https://snort.social/p/npub1clqc0wnk2vk42u35jzhc3emd64c0u4g6y3su4x44g26s8waj2pzskyrp9x)).
+## Connect
+I'd love to hear from you! Connect with me on Twitter ([@Anipy1](https://twitter.com/Anipy1)) or find me on Nostr ([@Anipy](https://snort.social/p/npub1clqc0wnk2vk42u35jzhc3emd64c0u4g6y3su4x44g26s8waj2pzskyrp9x)).
 
 ## Contributing
-Contributions are more than welcome! Whether it's bug fixes, new features, or general improvements, we appreciate your help in making this project even better.
+Contributions are more than welcome! Whether it's bug fixes, new features, or general improvements, I appreciate your help in making this project even better.
 
 Thank you for checking out the Stephan Livera Podcast AI project. I hope you enjoy the unique experience it offers. Feel free to reach out to me if you have any questions or feedback. Happy podcasting! 🎙️
