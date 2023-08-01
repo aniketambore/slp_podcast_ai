@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="assets/images/slp_logo.png" width="80px" alt="SLP AI Logo"/>
+    <img src="https://i.ibb.co/0hBzXtr/slp-logo.png" width="80px" alt="SLP AI Logo"/>
     <h1> Stephan Livera Podcast AI</h1>
 </div>
 
